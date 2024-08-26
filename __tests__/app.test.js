@@ -20,4 +20,12 @@ describe("GET /api/topics", () => {
         });
       });
   });
+  test("POST:404 responds with an appropriate status and error message when provided wrong url", () => {
+    return request(app)
+      .get("/api/topicsss")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
 });
