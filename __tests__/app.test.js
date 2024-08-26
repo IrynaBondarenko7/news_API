@@ -64,4 +64,20 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
+  test("GET:404 sends an appropriate status and error message when given a valid but non-existent article id", () => {
+    return request(app)
+      .get("/api/articles/888")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("article does not exist");
+      });
+  });
+  test("GET:400 sends an appropriate status and error message when given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/someArticleId")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
 });
