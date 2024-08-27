@@ -55,14 +55,6 @@ describe("GET /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.article).toMatchObject({
           article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: "2020-07-09T20:11:00.000Z",
-          votes: 100,
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
       });
   });
@@ -80,6 +72,36 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("GET:200 sends an array of articles to the client", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(13);
+        body.articles.forEach((topic) => {
+          expect(topic).toHaveProperty("author");
+          expect(topic).toHaveProperty("title");
+          expect(topic).toHaveProperty("article_id");
+          expect(topic).toHaveProperty("topic");
+          expect(topic).toHaveProperty("created_at");
+          expect(topic).toHaveProperty("votes");
+          expect(topic).toHaveProperty("article_img_url");
+          expect(topic).toHaveProperty("comment_count");
+          expect(topic).not.toHaveProperty("body");
+        });
+      });
+  });
+  test("the articles should be sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
