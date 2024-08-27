@@ -83,3 +83,25 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("GET /api/articles", () => {
+  test("GET:200 sends an array of articles to the client", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(13);
+        body.articles.forEach((topic) => {
+          expect(topic).toHaveProperty("author");
+          expect(topic).toHaveProperty("title");
+          expect(topic).toHaveProperty("article_id");
+          expect(topic).toHaveProperty("topic");
+          expect(topic).toHaveProperty("created_at");
+          expect(topic).toHaveProperty("votes");
+          expect(topic).toHaveProperty("article_img_url");
+          expect(topic).toHaveProperty("comment_count");
+          expect(topic).not.toHaveProperty("body");
+        });
+      });
+  });
+});
