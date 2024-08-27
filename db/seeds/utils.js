@@ -1,3 +1,6 @@
+const db = require("../connection");
+const format = require("pg-format");
+
 exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
   if (!created_at) return { ...otherProperties };
   return { created_at: new Date(created_at), ...otherProperties };
@@ -18,5 +21,18 @@ exports.formatComments = (comments, idLookup) => {
       author: created_by,
       ...this.convertTimestampToDate(restOfComment),
     };
+  });
+};
+
+exports.checkIdExists = (table_name, column_name, id) => {
+  const queryStr = format(
+    "SELECT * FROM %I WHERE %I = $1",
+    table_name,
+    column_name
+  );
+  return db.query(queryStr, [id]).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
   });
 };
