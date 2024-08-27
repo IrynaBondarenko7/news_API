@@ -3,6 +3,7 @@ const { getEndpoints } = require("./controllers/endpoins.controllers");
 const {
   getArticleById,
   getArticles,
+  getCommentsByArticleId,
 } = require("./controllers/articles.controllers");
 const {
   handlingCustomErrors,
@@ -16,6 +17,7 @@ app.get("/api/topics", getTopics);
 app.get("/api", getEndpoints);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.use((req, res, next) => {
   res.status(404).send({ msg: "Not found" });
