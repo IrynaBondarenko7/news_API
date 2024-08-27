@@ -21,7 +21,10 @@ describe("GET /api/topics", () => {
         });
       });
   });
-  test("POST:404 responds with an appropriate status and error message when provided wrong url", () => {
+});
+
+describe("Wrong endpoint", () => {
+  test("responds with 404 status and error message when provided wrong url", () => {
     return request(app)
       .get("/api/topicsss")
       .expect(404)
@@ -39,8 +42,7 @@ describe("GET /api", () => {
       .then(({ body }) => {
         const endpoints = body.endpoints;
 
-        expect(typeof endpoints).toBe("object");
-        expect(endpoints).not.toBeNull();
+        expect(endpoints).toEqual(endpointsData);
       });
   });
 });
