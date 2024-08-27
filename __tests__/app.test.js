@@ -107,7 +107,7 @@ describe("GET /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("GET:200 sends an array of comments for the given article_id to the client", () => {
+  test("GET:200 sends an array of comments (with the most recent comments first) for the given article_id to the client", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -122,15 +122,18 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(comment).toHaveProperty("body");
           expect(comment).toHaveProperty("article_id");
         });
+
+        expect(body.comments).toBeSortedBy("created_at", { descending: true });
       });
   });
 
-  test("comments should be served with the most recent comments first", () => {
+  test("GET:200 sends an empty array of comments for the given article_id when there are no comments", () => {
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/articles/8/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.comments).toBeSortedBy("created_at", { descending: true });
+        expect(body.comments.length).toBe(0);
+        expect(Array.isArray(body.comments)).toBe(true);
       });
   });
 
@@ -139,7 +142,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/888/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
+        expect(body.msg).toBe("not found");
       });
   });
   test("GET:400 sends an appropriate status and error message when given an invalid article id", () => {
