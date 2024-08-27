@@ -133,4 +133,21 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.comments).toBeSortedBy("created_at", { descending: true });
       });
   });
+
+  test("GET:404 sends an appropriate status and error message when given a valid but non-existent article id", () => {
+    return request(app)
+      .get("/api/articles/888/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
+  test("GET:400 sends an appropriate status and error message when given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/someId/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
 });
