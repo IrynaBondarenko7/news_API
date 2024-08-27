@@ -32,3 +32,15 @@ exports.selectCommentsByArticleId = (article_id) => {
       return result.rows;
     });
 };
+
+exports.insertNewCommentOnArticle = (author, body, article_id) => {
+  const createdTime = new Date();
+  return db
+    .query(
+      "INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3,0,$4) RETURNING *",
+      [body, author, article_id, createdTime]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

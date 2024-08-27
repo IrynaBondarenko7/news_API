@@ -151,3 +151,20 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST:201 inserts a new comment to the comments table and sends the new comment back to the client", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "I like this article",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.comment_id).toBe(19);
+        expect(body.comment.article_id).toBe(2);
+      });
+  });
+});
