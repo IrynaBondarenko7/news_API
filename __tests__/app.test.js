@@ -208,3 +208,18 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH:200 update an article votes by given number and sends the updated article back to the client", () => {
+    const votesCount = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(votesCount)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({ article_id: 2, votes: -100 });
+      });
+  });
+});

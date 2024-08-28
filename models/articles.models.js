@@ -47,3 +47,11 @@ exports.insertNewCommentOnArticle = (author, body, article_id) => {
       return result.rows[0];
     });
 };
+
+exports.updateArticleById = (inc_votes, article_id) => {
+  const queryStr = `UPDATE articles SET votes=votes+${inc_votes} WHERE article_id = $1 RETURNING *`;
+
+  return db.query(queryStr, [article_id]).then(({ rows }) => {
+    return rows[0];
+  });
+};
