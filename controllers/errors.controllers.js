@@ -5,6 +5,8 @@ exports.handlingCustomErrors = (err, req, res, next) => {
     err.msg === "comment does not exist"
   ) {
     res.status(404).send(err);
+  } else if (err.msg === "invalid request") {
+    res.status(err.status).send(err);
   } else {
     next(err);
   }

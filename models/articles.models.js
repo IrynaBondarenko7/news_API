@@ -12,14 +12,33 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectAllArticles = () => {
-  return db
-    .query(
-      "SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC"
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.selectAllArticles = (sort_by, order) => {
+  const validColumns = [
+    "article_id",
+    "title",
+    "author",
+    "created_at",
+    "topic",
+    "votes",
+    "article_img_url",
+  ];
+
+  let queryString =
+    "SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id";
+  if (sort_by) {
+    if (!validColumns.includes(sort_by)) {
+      return Promise.reject({ status: 400, msg: "invalid request" });
+    }
+    queryString += ` ORDER BY articles.${sort_by}`;
+  }
+  if (order) {
+    queryString += ` ${order}`;
+  } else {
+    queryString += ` ORDER BY articles.created_at DESC`;
+  }
+  return db.query(queryString).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.selectCommentsByArticleId = (article_id) => {
@@ -38,11 +57,10 @@ exports.selectCommentsByArticleId = (article_id) => {
 };
 
 exports.insertNewCommentOnArticle = (author, body, article_id) => {
-  const createdTime = new Date();
   return db
     .query(
-      "INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3,0,$4) RETURNING *",
-      [body, author, article_id, createdTime]
+      "INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *",
+      [body, author, article_id]
     )
     .then((result) => {
       return result.rows[0];
