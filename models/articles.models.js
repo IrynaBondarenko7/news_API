@@ -52,6 +52,8 @@ exports.updateArticleById = (inc_votes, article_id) => {
   const queryStr = `UPDATE articles SET votes=votes+${inc_votes} WHERE article_id = $1 RETURNING *`;
 
   return db.query(queryStr, [article_id]).then(({ rows }) => {
+    if (rows.length === 0)
+      return Promise.reject({ status: 404, msg: "article does not exist" });
     return rows[0];
   });
 };

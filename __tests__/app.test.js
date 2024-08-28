@@ -222,4 +222,40 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.article).toMatchObject({ article_id: 2, votes: -100 });
       });
   });
+
+  test("PATCH:400 sends an appropriate status and error message when no provided updated body", () => {
+    return request(app)
+      .patch("/api/articles/2")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+
+  test("PATCH:400 sends an appropriate status and error message when given an invalid article id", () => {
+    const votesCount = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/articles/updatedId")
+      .send(votesCount)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+
+  test("PATCH:404 responds with an appropriate status and error message when given a valid but non-existent article id", () => {
+    const votesCount = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/articles/88")
+      .send(votesCount)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
 });
