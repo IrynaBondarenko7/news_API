@@ -1,3 +1,4 @@
+const format = require("pg-format");
 const db = require("../db/connection");
 const { checkIdExists } = require("../db/seeds/utils");
 
@@ -49,7 +50,10 @@ exports.insertNewCommentOnArticle = (author, body, article_id) => {
 };
 
 exports.updateArticleById = (inc_votes, article_id) => {
-  const queryStr = `UPDATE articles SET votes=votes+${inc_votes} WHERE article_id = $1 RETURNING *`;
+  const queryStr = format(
+    "UPDATE articles SET votes=votes + %L WHERE article_id = $1 RETURNING *",
+    inc_votes
+  );
 
   return db.query(queryStr, [article_id]).then(({ rows }) => {
     if (rows.length === 0)
