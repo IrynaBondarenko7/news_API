@@ -12,7 +12,7 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectAllArticles = (sort_by, order) => {
+exports.selectAllArticles = (sort_by, order, topic) => {
   const validColumns = [
     "article_id",
     "title",
@@ -36,6 +36,11 @@ exports.selectAllArticles = (sort_by, order) => {
   } else {
     queryString += ` ORDER BY articles.created_at DESC`;
   }
+
+  if (topic) {
+    queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+  }
+
   return db.query(queryString).then((result) => {
     return result.rows;
   });
