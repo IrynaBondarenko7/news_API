@@ -1,5 +1,9 @@
 exports.handlingCustomErrors = (err, req, res, next) => {
-  if (err.msg === "article does not exist" || err.msg === "not found") {
+  if (
+    err.msg === "article does not exist" ||
+    err.msg === "not found" ||
+    err.msg === "comment does not exist"
+  ) {
     res.status(404).send(err);
   } else {
     next(err);
