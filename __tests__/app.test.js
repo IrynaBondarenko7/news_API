@@ -167,10 +167,27 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(201)
       .then(({ body }) => {
         expect(body.comment.comment_id).toBe(19);
-        expect(body.comment.article_id).toBe(2);
+        expect(body.comment).toMatchObject({
+          body: "I like this article",
+          article_id: 2,
+          author: "butter_bridge",
+          votes: 0,
+        });
       });
   });
-  test("POST:400 responds with an appropriate status and error message when provided with a bad comment (no user name)", () => {
+  test("POST:404 responds with an appropriate status and error message when provided with non-existent username", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "banana",
+        body: "I like this article",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("does not exist");
+      });
+  });
+  test("POST:404 responds with an appropriate status and error message when provided with a bad comment (no user name)", () => {
     return request(app)
       .post("/api/articles/2/comments")
       .send({
@@ -191,7 +208,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("id does not exist");
+        expect(body.msg).toBe("does not exist");
       });
   });
   test("POST:400 sends an appropriate status and error message when given an invalid article id", () => {
