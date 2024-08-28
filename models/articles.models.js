@@ -1,6 +1,6 @@
 const format = require("pg-format");
 const db = require("../db/connection");
-const { checkIdExists } = require("../db/seeds/utils");
+const { checkExists } = require("../db/seeds/utils");
 
 exports.selectArticleById = (article_id) => {
   return db
@@ -12,7 +12,8 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectAllArticles = (sort_by, order) => {
+exports.selectAllArticles = (sort_by, order, topic) => {
+  const queryProms = [];
   const validColumns = [
     "article_id",
     "title",
@@ -36,8 +37,16 @@ exports.selectAllArticles = (sort_by, order) => {
   } else {
     queryString += ` ORDER BY articles.created_at DESC`;
   }
-  return db.query(queryString).then((result) => {
-    return result.rows;
+
+  if (topic) {
+    queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+    queryProms.push(checkExists("articles", "topic", topic));
+  }
+
+  queryProms.push(db.query(queryString));
+
+  return Promise.all(queryProms).then((response) => {
+    return queryProms.length === 1 ? response[0].rows : response[1].rows;
   });
 };
 
@@ -49,7 +58,7 @@ exports.selectCommentsByArticleId = (article_id) => {
       [article_id]
     )
   );
-  queryProms.push(checkIdExists("articles", "article_id", article_id));
+  queryProms.push(checkExists("articles", "article_id", article_id));
 
   return Promise.all(queryProms).then((promResults) => {
     return promResults[0].rows;

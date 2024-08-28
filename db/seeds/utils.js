@@ -24,7 +24,7 @@ exports.formatComments = (comments, idLookup) => {
   });
 };
 
-exports.checkIdExists = (table_name, column_name, id) => {
+exports.checkExists = (table_name, column_name, id) => {
   const queryStr = format(
     "SELECT * FROM %I WHERE %I = $1",
     table_name,
