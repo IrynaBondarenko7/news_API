@@ -346,4 +346,12 @@ describe("GET /api/articles (topic query)", () => {
         });
       });
   });
+  test("GET:404 responds with an appropriate status and error message when given a non-existent topic", () => {
+    return request(app)
+      .get("/api/articles?topic=banana")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
+      });
+  });
 });
