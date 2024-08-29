@@ -6,6 +6,7 @@ const {
   getCommentsByArticleId,
   postCommentOnArticle,
   patchArticleById,
+  getGreeting,
 } = require("./controllers/articles.controllers");
 const {
   handlingCustomErrors,
@@ -19,6 +20,7 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/", getGreeting);
 app.get("/api/topics", getTopics);
 app.get("/api", getEndpoints);
 app.get("/api/articles/:article_id", getArticleById);

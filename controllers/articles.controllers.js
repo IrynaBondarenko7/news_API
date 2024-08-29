@@ -62,3 +62,7 @@ exports.patchArticleById = (req, res, next) => {
       next(err);
     });
 };
+
+exports.getGreeting = (req, res) => {
+  res.status(200).send({ greeting: "Welcome to newsAPI" });
+};
