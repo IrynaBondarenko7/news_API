@@ -32,11 +32,11 @@ Before you begin, ensure you have the following software installed:
    git clone https://github.com/IrynaBondarenko7/news_API.git
    cd news_API
    ```
-2. Install dependencies:
+2. **Install dependencies**:
    ```
    npm install
    ```
-3. Create environment variable files:
+3. **Create environment variable files**:
 
    - Create two files: .env.test and .env.development in the root directory.
    - Inside each file, add the following line with the appropriate database name, replace your_database_name with the name of your PostgreSQL database:
