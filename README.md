@@ -56,7 +56,7 @@ npm run setup-dbs
 npm run seed
 ```
 
-### Running Tests
+## Running Tests
 
 To run tests, use the following command:
 
@@ -64,7 +64,7 @@ To run tests, use the following command:
 npm test
 ```
 
-### Hosted Version
+## Hosted Version
 
 You can access the hosted version of this News API at:
 
