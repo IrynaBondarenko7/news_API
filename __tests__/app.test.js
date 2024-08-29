@@ -397,3 +397,14 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       });
   });
 });
+
+describe("GET /", () => {
+  test("GET: 200 sends greeting to client", () => {
+    return request(app)
+      .get("/")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.greeting).toBe("Welcome to newsAPI");
+      });
+  });
+});
