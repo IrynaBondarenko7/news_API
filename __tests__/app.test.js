@@ -316,6 +316,26 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/articles (sorting queries)", () => {
+  test("GET:200 sorts the articles by any valid column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sorts the articles for ascending or descending order", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
   test("GET:200 sorts the articles by any valid column for ascending or descending", () => {
     return request(app)
       .get("/api/articles?sort_by=created_at&order=asc")
@@ -326,7 +346,15 @@ describe("GET /api/articles (sorting queries)", () => {
   });
   test("GET:400 responds with an appropriate status and error message when given a non-existent column name", () => {
     return request(app)
-      .get("/api/articles?sort_by=banana&order=asc")
+      .get("/api/articles?sort_by=banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid request");
+      });
+  });
+  test("GET:400 responds with an appropriate status and error message when given invalid order name", () => {
+    return request(app)
+      .get("/api/articles?order=banana")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("invalid request");

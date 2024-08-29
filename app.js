@@ -7,6 +7,7 @@ const {
   postCommentOnArticle,
   patchArticleById,
 } = require("./controllers/articles.controllers");
+
 const {
   handlingCustomErrors,
   handlingPsqlErrors,
@@ -15,6 +16,7 @@ const { deleteCommentById } = require("./controllers/comments.controllers");
 const { getUsers } = require("./controllers/users.controllers");
 
 const express = require("express");
+
 const app = express();
 
 app.use(express.json());

@@ -24,8 +24,8 @@ exports.selectAllArticles = (sort_by, order, topic) => {
     "created_at",
     "topic",
     "votes",
-    "article_img_url",
   ];
+  const validOrder = ["desc", "asc"];
 
   let queryString =
     "SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id";
@@ -33,10 +33,16 @@ exports.selectAllArticles = (sort_by, order, topic) => {
     if (!validColumns.includes(sort_by)) {
       return Promise.reject({ status: 400, msg: "invalid request" });
     }
-    queryString += ` ORDER BY articles.${sort_by}`;
-  }
-  if (order) {
-    queryString += ` ${order}`;
+    order
+      ? (queryString += ` ORDER BY articles.${sort_by} ${order}`)
+      : (queryString += ` ORDER BY articles.${sort_by} DESC`);
+  } else if (order) {
+    if (!validOrder.includes(order)) {
+      return Promise.reject({ status: 400, msg: "invalid request" });
+    }
+    sort_by
+      ? (queryString += ` ORDER BY articles.${sort_by} ${order}`)
+      : (queryString += ` ORDER BY articles.created_at ${order}`);
   } else {
     queryString += ` ORDER BY articles.created_at DESC`;
   }
