@@ -4,6 +4,7 @@ exports.handlingCustomErrors = (err, req, res, next) => {
     "not found",
     "comment does not exist",
     "user does not exist",
+    "comment does not exist",
   ];
 
   if (errorsMessages.includes(err.msg)) {
