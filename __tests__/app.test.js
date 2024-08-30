@@ -446,4 +446,37 @@ describe("PATCH /api/comments/:comment_id", () => {
         expect(body.comment).toMatchObject({ comment_id: 1, votes: 17 });
       });
   });
+  test("PATCH:400 sends an appropriate status and error message when no provided updated body", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("PATCH:400 sends an appropriate status and error message when given an invalid comment id", () => {
+    const votesCount = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/comments/updatedId")
+      .send(votesCount)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("PATCH:404 responds with an appropriate status and error message when given a valid but non-existent comment id", () => {
+    const votesCount = {
+      inc_votes: -100,
+    };
+    return request(app)
+      .patch("/api/comments/88")
+      .send(votesCount)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("comment does not exist");
+      });
+  });
 });
