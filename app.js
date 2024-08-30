@@ -22,4 +22,8 @@ app.use((req, res, next) => {
 app.use(handlingCustomErrors);
 app.use(handlingPsqlErrors);
 
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: "Internal Server Error" });
+});
+
 module.exports = app;
