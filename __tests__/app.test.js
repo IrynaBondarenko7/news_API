@@ -432,3 +432,18 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("PATCH:200 update a comment votes by given number and sends the updated comment back to the client", () => {
+    const votesCount = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votesCount)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject({ comment_id: 1, votes: 17 });
+      });
+  });
+});
