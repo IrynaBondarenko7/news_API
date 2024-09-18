@@ -29,14 +29,18 @@ exports.selectAllArticles = (sort_by, order, topic) => {
   const validOrder = ["desc", "asc"];
 
   let queryString =
-    "SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id";
+    "SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id";
   if (sort_by) {
+    let sortString =
+      sort_by === "comment_count" ? sort_by : `articles.${sort_by}`;
+
     if (!validColumns.includes(sort_by)) {
       return Promise.reject({ status: 400, msg: "invalid request" });
     }
+
     order
-      ? (queryString += ` ORDER BY articles.${sort_by} ${order}`)
-      : (queryString += ` ORDER BY articles.${sort_by} DESC`);
+      ? (queryString += ` ORDER BY ${sortString} ${order}`)
+      : (queryString += ` ORDER BY ${sortString} DESC`);
   } else if (order) {
     if (!validOrder.includes(order)) {
       return Promise.reject({ status: 400, msg: "invalid request" });
@@ -49,16 +53,21 @@ exports.selectAllArticles = (sort_by, order, topic) => {
   }
 
   if (topic) {
-    if (sort_by && order) {
-      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
-    } else if (sort_by) {
-      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.${sort_by} ASC`;
-    } else if (order) {
-      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at ${order}`;
-    } else {
-      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
-    }
+    let sortString = "";
 
+    if (sort_by) {
+      sortString =
+        sort_by === "comment_count" ? sort_by : `articles.${sort_by}`;
+    }
+    if (sort_by && order) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY ${sortString} ${order}`;
+    } else if (sort_by) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY ${sortString} ASC`;
+    } else if (order) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at ${order}`;
+    } else {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+    }
     queryProms.push(checkExists("articles", "topic", topic));
   }
 

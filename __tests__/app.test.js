@@ -326,6 +326,27 @@ describe("GET /api/articles (sorting queries)", () => {
         });
       });
   });
+  test("GET:200 sorts the articles by comment_count column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sorts the articles by comment_count column& order=asc &topic", () => {
+    return request(app)
+      .get("/api/articles?order=desc&sort_by=comment_count&topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+
   test("GET:200 sorts the articles for ascending or descending order", () => {
     return request(app)
       .get("/api/articles?order=asc")
