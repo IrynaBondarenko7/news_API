@@ -374,6 +374,67 @@ describe("GET /api/articles (topic query)", () => {
         });
       });
   });
+  test("GET:200 filters the articles by the topic and sort_by=created_at query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+  test("GET:200 filters the articles by the topic and order=desc query ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  test("GET:200 filters the articles by the topic and order=desc and sort_by=created_at queries ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&order=desc&sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  test("GET:400 responds with an appropriate status and error message when given a non-existent column name with topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid request");
+      });
+  });
+  test("GET:400 responds with an appropriate status and error message when given invalid order name with topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&order=banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid request");
+      });
+  });
+
   test("GET:404 responds with an appropriate status and error message when given a non-existent topic", () => {
     return request(app)
       .get("/api/articles?topic=banana")

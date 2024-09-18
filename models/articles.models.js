@@ -24,6 +24,7 @@ exports.selectAllArticles = (sort_by, order, topic) => {
     "created_at",
     "topic",
     "votes",
+    "comment_count",
   ];
   const validOrder = ["desc", "asc"];
 
@@ -48,7 +49,16 @@ exports.selectAllArticles = (sort_by, order, topic) => {
   }
 
   if (topic) {
-    queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+    if (sort_by && order) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
+    } else if (sort_by) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.${sort_by} ASC`;
+    } else if (order) {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at ${order}`;
+    } else {
+      queryString = `SELECT articles.article_id, articles.title, articles.author, articles.created_at, articles.topic, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.topic='${topic}' GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+    }
+
     queryProms.push(checkExists("articles", "topic", topic));
   }
 
