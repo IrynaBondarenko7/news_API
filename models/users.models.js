@@ -17,3 +17,14 @@ exports.selectUserByName = (username) => {
       return rows[0];
     });
 };
+
+exports.insertNewUser = (name, username, avatar_url) => {
+  return db
+    .query(
+      "INSERT INTO users (name, username, avatar_url) VALUES ($1, $2, $3) RETURNING *",
+      [name, username, avatar_url]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

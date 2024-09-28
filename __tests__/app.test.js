@@ -515,6 +515,55 @@ describe("GET /api/users/:username", () => {
   });
 });
 
+describe("POST /api/users", () => {
+  test("POST:201 sends an user objects back to the client", () => {
+    const newUser = {
+      username: "mandarina123",
+      name: "Iryna",
+      avatar_url:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS712yFPp4-6nCa8hn9RxN7GF06-Ut4mcTvdA&s",
+    };
+    return request(app)
+      .post("/api/users")
+      .send(newUser)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.user).toMatchObject({
+          username: "mandarina123",
+          name: "Iryna",
+          avatar_url:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS712yFPp4-6nCa8hn9RxN7GF06-Ut4mcTvdA&s",
+        });
+      });
+  });
+  test("GET:400 sends an appropriate status and error message when provided with a bad body (no userName)", () => {
+    return request(app)
+      .post("/api/users")
+      .send({
+        name: "Iryna",
+        avatar_url:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS712yFPp4-6nCa8hn9RxN7GF06-Ut4mcTvdA&s",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("GET:400 sends an appropriate status and error message when provided with a bad body (no name)", () => {
+    return request(app)
+      .post("/api/users")
+      .send({
+        username: "mandarina123",
+        avatar_url:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS712yFPp4-6nCa8hn9RxN7GF06-Ut4mcTvdA&s",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
+
 describe("PATCH /api/comments/:comment_id", () => {
   test("PATCH:200 update a comment votes by given number and sends the updated comment back to the client", () => {
     const votesCount = {
